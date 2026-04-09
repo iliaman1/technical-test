@@ -75,7 +75,7 @@ def get_score(game_stamps, offset):
 
 ### Задача
 
-Для разработанной в предыдущем задании функции get_score(game_stamps, offset) разработайте unit-тесты на фреймворке [unittest](https://docs.python.org/3/library/unittest.html).  
+Для разработанной в предыдущем задании функции get_score(game_stamps, offset) разработайте unit-тесты на фреймворке [unittest](https://docs.python.org/3/library/unittest.html).
 Тесты должны учитывать все возможные случаи использования функции, концентрироваться на проверке одного случая, не повторяться, название тестов должно отражать суть выполняемой проверки.
 
 ### Результат

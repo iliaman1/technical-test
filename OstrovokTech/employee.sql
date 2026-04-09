@@ -1087,4 +1087,3 @@ ALTER TABLE ONLY employee
 --
 -- PostgreSQL database dump complete
 --
-
