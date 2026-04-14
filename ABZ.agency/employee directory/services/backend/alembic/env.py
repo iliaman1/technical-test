@@ -8,10 +8,11 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from app.database import Base
 from app.core.config import settings
 
 
-sys.path.insert(0, str(Path(__file__).resolve().parent[1]))  # type: ignore
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 config = context.config
 
@@ -21,7 +22,7 @@ if config.config_file_name is not None:
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
 
-target_metadata = None
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:

@@ -5,10 +5,8 @@ services:
     image: postgres:14-alpine
     container_name: employee_db
     restart: always
-    env_file:
-      - ../.env
     ports:
-      - "${DB_PORT}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 

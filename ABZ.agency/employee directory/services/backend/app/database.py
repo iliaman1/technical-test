@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, Column, Integer, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base, declared_attr
 from sqlalchemy.sql import func
 
-from core.config import settings
+from .core.config import settings
 
 engine = create_engine(settings.database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
