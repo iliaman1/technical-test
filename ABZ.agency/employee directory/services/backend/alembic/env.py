@@ -10,6 +10,7 @@ from alembic import context
 
 from app.database import Base
 from app.core.config import settings
+from app import modles  # noqa: F401
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))

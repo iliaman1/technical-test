@@ -10,7 +10,7 @@ class Employee(Model):
     hire_date = Column(Date, nullable=False)
     salary = Column(Numeric(10, 2), nullable=False)
 
-    manager_id = Column(Integer, ForeignKey("employee.id"), nullable=True)
+    manager_id = Column(Integer, ForeignKey("employee.id"), nullable=True, index=True)
 
     manager = relationship(
         "Employee", remote_side=lambda: Employee.id, back_populates="subordinates"

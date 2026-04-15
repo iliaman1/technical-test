@@ -67,8 +67,7 @@ def create_employees_with_hierarchy(db: Session, total_employees: int, depth: in
         )
         bulk_employees.append(employee)
 
-    db.bulk_save_objects(employees)
-    db.bulk_save_objects(bulk_employees)
+    db.add_all(employees + bulk_employees)
     db.commit()
 
 
