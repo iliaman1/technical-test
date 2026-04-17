@@ -19,3 +19,8 @@ def get_db():
 @router.get("/tree", response_model=list[schemas.Employee])
 def read_employee_tree(db: Session = Depends(get_db)):
     return crud.employee.get_employee_tree(db)
+
+
+@router.get("/{employee_id}/subordinates", response_model=list[schemas.Employee])
+def read_employee_subordinates(employee_id: int, db: Session = Depends(get_db)):
+    return crud.employee.get_subordinates(db, employee_id)
