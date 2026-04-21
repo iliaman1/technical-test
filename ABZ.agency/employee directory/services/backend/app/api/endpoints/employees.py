@@ -16,6 +16,13 @@ def get_db():
         db.close()
 
 
+@router.get("/", response_model=list[schemas.Employee])
+def read_employees(
+    db: Session = Depends(get_db), sort_by: str | None = None, order: str = "asc"
+):
+    return crud.employee.get_all_employees(db, sort_by, order)
+
+
 @router.get("/tree", response_model=list[schemas.Employee])
 def read_employee_tree(db: Session = Depends(get_db)):
     return crud.employee.get_employee_tree(db)

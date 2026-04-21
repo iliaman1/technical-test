@@ -9,3 +9,8 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/", response_class=HTMLResponse)
 async def get_employee_tree_page(request: Request):
     return templates.TemplateResponse(request, "index.html")
+
+
+@router.get("/list", response_class=HTMLResponse)
+async def get_employee_list_page(request: Request):
+    return templates.TemplateResponse(request, "employee_list.html")
