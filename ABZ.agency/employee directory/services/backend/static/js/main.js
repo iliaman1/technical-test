@@ -1,0 +1,81 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const employeeTree = document.getElementById('employee-tree');
+
+    async function renderEmployee(employee, parentElement) {
+        const li = document.createElement('li');
+        li.className = 'employee';
+        li.setAttribute('data-employee-id', employee.id);
+        li.innerHTML = `
+                    <span>${employee.full_name} (${employee.position})</span>
+                    <span style="font-size: 0.8em; color: gray;"> | ЗП: ${employee.salary} | Дата найма: ${employee.hire_date}</span>
+                `;
+
+        const subordinatesUL = document.createElement('ul')
+        subordinatesUL.className = 'subordinates';
+        li.appendChild(subordinatesUL);
+        parentElement.appendChild(li);
+
+        li.addEventListener('click', async (event) => {
+            event.stopPropagation();
+
+            li.classList.toggle('open');
+            subordinatesUL.classList.toggle('open');
+
+            if (li.classList.contains('open') && subordinatesUL.children.length === 0) {
+                await fetchSubordinates(employee.id, subordinatesUL)
+            }
+        });
+    }
+    async function fetchSubordinates(employeeId, subordinatesUL) {
+        try {
+            const response = await fetch(`/employees/${employeeId}/subordinates`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const subordinates = await response.json();
+
+            if (subordinates.length === 0) {
+                subordinatesUL.innerHTML = `<li style="color: gray;">Нет прямых подчиненных</li>`;
+                const parentLi = subordinatesUL.parentElement;
+                if (parentLi && parentLi.classList.contains('has-subordinates')) {
+                    parentLi.classList.remove('has-subordinates');
+                }
+                return;
+            }
+
+            for (const sub of subordinates) {
+                await renderEmployee(sub, subordinatesUL);
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке подчиненных:', error);
+            subordinatesUL.innerHTML = `<li style="color: red;">Ошибка загрузки: ${error.message}</li>`;
+            const parentLi = subordinatesUL.parentElement;
+            if (parentLi && parentLi.classList.contains('has-subordinates')) {
+                parentLi.classList.remove('has-subordinates');
+            }
+        }
+    }
+    async function init() {
+        try {
+            const response = await fetch('/employees/tree');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+            const topLevelEmployees = await response.json();
+
+            if (topLevelEmployees.length === 0) {
+                employeeTree.innerHTML = '<li>Net sotrydnikov.</li>';
+                return;
+            }
+
+            for (const employee of topLevelEmployees) {
+                await renderEmployee(employee, employeeTree, true);
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке верхнего уровня сотрудников:', error);
+            employeeTree.innerHTML = `<li style="color: red;">Ошибка загрузки: ${error.message}</li>`;
+        }
+    }
+
+    init();
+});
