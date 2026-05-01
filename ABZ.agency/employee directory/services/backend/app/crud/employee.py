@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, noload
 from .. import modles
 
@@ -19,8 +20,22 @@ def get_subordinates(db: Session, employee_id: int):
     return employee.subordinates if employee else []
 
 
-def get_all_employees(db: Session, sort_by: str | None = None, order: str = "asc"):
+def get_all_employees(
+    db: Session,
+    sort_by: str | None = None,
+    order: str = "asc",
+    search: str | None = None,
+):
     query = db.query(modles.Employee)
+    if search:
+        search_term = f"{search}"
+        query = query.filter(
+            or_(
+                modles.Employee.full_name.ilike(search_term),
+                modles.Employee.position.ilike(search_term),
+            )
+        )
+
     allowed_sort_columns = {
         "full_name": modles.Employee.full_name,
         "position": modles.Employee.position,
