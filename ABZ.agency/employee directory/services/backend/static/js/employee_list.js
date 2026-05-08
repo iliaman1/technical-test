@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
     const tbody = document.getElementById('employee-table-body');
     const searchInput = document.getElementById('search-input');
     const searchForm = document.getElementById('search-form');
@@ -28,8 +33,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentSort = urlParams.get('sort_by') || 'full_name';
         currentOrder = urlParams.get('order') || 'asc';
         currentSearch = urlParams.get('search') || '';
-
         searchInput.value = currentSearch;
+    }
+
+    function updateSortIndicators() {
+        headerLinks.forEach(a => {
+            const sortKey = a.getAttribute('data-sort');
+            a.textContent = a.textContent.replace(' ▲', '').replace(' ▼', '');
+
+            if (currentSort === sortKey) {
+                a.textContent += (currentOrder === 'asc') ? ' ▲' : ' ▼';
+            }
+        });
     }
 
     async function loadTableData() {
@@ -42,7 +57,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 apiUrl.searchParams.append('search', currentSearch);
             }
 
-            const response = await fetch(apiUrl);
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+
+            const response = await fetch(apiUrl, { headers });
+            if (response.status === 401) {
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+                return;
+            }
+
             const employees = await response.json();
             tbody.innerHTML = '';
 
@@ -68,30 +93,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function updateSortIndicators() {
-        headerLinks.forEach(a => {
-            const sortKey = a.getAttribute('data-sort');
-            a.textContent = a.textContent.replace(' ▲', '').replace(' ▼', '');
-
-            if (currentSort === sortKey) {
-                a.textContent += (currentOrder === 'asc') ? ' ▲' : ' ▼';
-            }
-        });
-    }
-
     headerLinks.forEach(a => {
         a.addEventListener('click', async (event) => {
             event.preventDefault();
 
             const sortKey = a.getAttribute('data-sort');
-            let newOrder = 'asc';
 
             if (currentSort === sortKey) {
-                newOrder = (currentOrder === 'asc') ? 'desc' : 'asc';
+                currentOrder = (currentOrder === 'asc') ? 'desc' : 'asc';
+            } else {
+                currentSort = sortKey;
+                currentOrder = 'asc';
             }
-
-            currentSort = sortKey;
-            currentOrder = newOrder;
 
             updateUrl();
             updateSortIndicators();
@@ -102,7 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         currentSearch = searchInput.value;
-
         updateUrl();
         await loadTableData();
     });
