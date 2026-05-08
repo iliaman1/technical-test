@@ -1,1 +1,1 @@
-from . import employee  # noqa: F401
+from . import employee, user  # noqa: F401
