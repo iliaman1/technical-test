@@ -9,6 +9,12 @@ class EmployeeBase(BaseModel):
     position: str
 
 
+class EmployeeCreate(EmployeeBase):
+    hire_date: date
+    salary: Decimal
+    manager_id: int | None = None
+
+
 class Employee(EmployeeBase):
     id: int
     hire_date: date

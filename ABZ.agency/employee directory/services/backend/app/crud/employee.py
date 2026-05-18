@@ -1,6 +1,7 @@
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, noload
-from .. import modles
+from app import modles
+from app import schemas
 
 
 def get_employee_tree(db: Session):
@@ -51,3 +52,33 @@ def get_all_employees(
             query = query.order_by(column_to_sort.asc())
 
     return query.all()
+
+
+def get_employee(db: Session, employee_id: int):
+    return db.query(modles.Employee).filter(modles.Employee.id == employee_id).first()
+
+
+def create_employee(db: Session, employee: schemas.EmployeeCreate):
+    db_employee = modles.Employee(**employee.model_dump())
+    db.add(db_employee)
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
+
+
+def update_employee(
+    db: Session, db_employee: modles.Employee, employee_in: schemas.EmployeeCreate
+):
+    employee_data = employee_in.model_dump(exclude_unset=True)
+    for key, value in employee_data.items():
+        setattr(db_employee, key, value)
+    db.add(db_employee)
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
+
+
+def delete_employee(db: Session, db_employee: modles.Employee):
+    db.delete(db_employee)
+    db.commit()
+    return db_employee
