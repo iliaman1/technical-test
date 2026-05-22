@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadTableData() {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center">Загрузка...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Загрузка...</td></tr>';
         try {
             const apiUrl = new URL('/employees/', window.location.origin);
             apiUrl.searchParams.append('sort_by', currentSort);
@@ -78,20 +78,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             employees.forEach(emp => {
                 const row = document.createElement('tr');
+                row.setAttribute('data-row-id', emp.id);
                 const hireDate = new Date(emp.hire_date).toLocaleDateString('ru-RU');
                 row.innerHTML = `
                     <td>${emp.full_name}</td>
                     <td>${emp.position}</td>
                     <td>${hireDate}</td>
                     <td>${emp.salary.toLocaleString('ru-RU')}</td>
+                    <td>
+                        <a href="/edit/${emp.id}" class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                        <button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${emp.id}">Удалить</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Ошибка загрузки данных.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Ошибка загрузки данных.</td></tr>';
             console.error("Failed to load employees:", error);
         }
     }
+
+    tbody.addEventListener('click', async (event) => {
+        if (event.target && event.target.dataset.action === 'delete') {
+            const employeeId = event.target.dataset.id;
+            if (confirm(`Вы точно хотите удалить сотрудника с ID ${employeeId}?`)) {
+                try {
+                    const response = await fetch(`/employees/${employeeId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const rowToRemove = document.querySelector(`tr[data-row-id='${employeeId}']`);
+                        if (rowToRemove) {
+                            rowToRemove.remove();
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Ошибка удаления: ${errorData.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    alert(`Сетевая ошибка: ${error}`);
+                }
+            }
+        }
+    });
 
     headerLinks.forEach(a => {
         a.addEventListener('click', async (event) => {

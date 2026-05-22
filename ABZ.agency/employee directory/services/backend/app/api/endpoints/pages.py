@@ -20,3 +20,13 @@ async def get_login_page(request: Request):
 @router.get("/list", response_class=HTMLResponse)
 async def get_employee_list_page(request: Request):
     return templates.TemplateResponse(request, "employee_list.html")
+
+
+@router.get("/create", response_class=HTMLResponse)
+async def get_create_employee_page(request: Request):
+    return templates.TemplateResponse(request, "employee_form.html")
+
+
+@router.get("/edit/{employee_id}", response_class=HTMLResponse)
+async def get_edit_employee_page(request: Request, employee_id: int):
+    return templates.TemplateResponse(request, "employee_form.html")
