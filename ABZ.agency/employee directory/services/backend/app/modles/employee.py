@@ -12,6 +12,8 @@ class Employee(Model):
 
     manager_id = Column(Integer, ForeignKey("employee.id"), nullable=True, index=True)
 
+    photo_path = Column(String, nullable=True)
+
     manager = relationship(
         "Employee", remote_side=lambda: Employee.id, back_populates="subordinates"
     )

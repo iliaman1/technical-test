@@ -67,7 +67,7 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate):
 
 
 def update_employee(
-    db: Session, db_employee: modles.Employee, employee_in: schemas.EmployeeCreate
+    db: Session, db_employee: modles.Employee, employee_in: schemas.EmployeeUpdate
 ):
     employee_data = employee_in.model_dump(exclude_unset=True)
     for key, value in employee_data.items():
