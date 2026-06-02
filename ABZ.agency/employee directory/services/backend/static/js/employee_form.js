@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hireDateInput = document.getElementById('hire_date');
     const salaryInput = document.getElementById('salary');
     const managerIdInput = document.getElementById('manager_id');
+    const photoInput = document.getElementById('photo');
+    const photoPreview = document.getElementById('photo-preview');
+    const noPhotoText = document.getElementById('no-photo-text');
 
     const path = window.location.pathname;
     const isEditMode = path.startsWith('/edit/');
@@ -35,10 +38,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             hireDateInput.value = emp.hire_date;
             salaryInput.value = emp.salary;
             managerIdInput.value = emp.manager_id || '';
+
+            if (emp.photo_path) {
+                photoPreview.src = emp.photo_path;
+                photoPreview.style.display = 'block';
+                noPhotoText.style.display = 'none';
+            } else {
+                photoPreview.style.display = 'none';
+                noPhotoText.style.display = 'block';
+            }
+
         } catch (error) {
             errorMessage.textContent = error.message;
             form.style.display = 'none';
         }
+    } else {
+        formTitle.textContent = 'Создание сотрудника';
+        noPhotoText.style.display = 'block';
     }
 
     form.addEventListener('submit', async (event) => {
@@ -69,6 +85,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.detail || 'Не удалось сохранить данные');
+            }
+
+            const savedEmployee = await response.json();
+            const photoFile = photoInput.files[0];
+            if (photoFile) {
+                const photoFormData = new FormData();
+                photoFormData.append('photo_file', photoFile);
+
+                const photoResponse = await fetch(`/employees/${savedEmployee.id}/upload-photo`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: photoFormData
+                });
+                if (!photoResponse.ok) {
+                    throw new Error('Текстовые данные сохранены, но не удалось загрузить фото.');
+                }
             }
 
             window.location.href = '/list';

@@ -35,6 +35,17 @@
                 <input type="number" class="form-control" id="manager_id" placeholder="Оставте пустым, если нет">
             </div>
 
+            <div class="mb-3">
+                <label for="photo" class="from-label">Новая фотография</label>
+                <input class="form-control" type="file" id="photo" accept="image/*">
+                <div class="mt-2">
+                    <p class="mb-1">Текущее фото:</p>
+                    <img id="photo-preview" src="" alt="Фото сотрудника" class="img-thumbnail"
+                        style="max-width: 200px; display: none;">
+                    <p id="no-photo-text" class="text-muted" style="display: none;">Фото не загружено</p>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <p id="error-message" class="mt-3 text-danger"></p>
         </form>
